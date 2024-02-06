@@ -1,0 +1,69 @@
+[gd_scene load_steps=13 format=3 uid="uid://dvq5icrfmwbwa"]
+
+[ext_resource type="Texture2D" uid="uid://bcq64p4c0argh" path="res://assets/steinbach_field_4k.hdr" id="1_4ue32"]
+[ext_resource type="Script" path="res://addons/godot-free-look-camera-132062011edfce9399a489756064cfea880dad4c/free_look_camera.gd" id="1_cl2r3"]
+[ext_resource type="Shader" path="res://scenes/film.gdshader" id="4_wn3n1"]
+[ext_resource type="Texture2D" uid="uid://bsvy0juvk2ywj" path="res://assets/tiger-ii-porsche-yellow-187-ready-made.png" id="5_e6x5q"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_5uc45"]
+panorama = ExtResource("1_4ue32")
+
+[sub_resource type="Sky" id="Sky_k8yck"]
+sky_material = SubResource("PanoramaSkyMaterial_5uc45")
+
+[sub_resource type="Environment" id="Environment_0c71k"]
+background_mode = 2
+sky = SubResource("Sky_k8yck")
+ambient_light_source = 3
+reflected_light_source = 2
+glow_enabled = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n56sn"]
+render_priority = 0
+shader = ExtResource("4_wn3n1")
+shader_parameter/shake_amount = 0.005
+shader_parameter/saturation = 0.2
+shader_parameter/contrast = 1.5
+shader_parameter/brightness = 0.125
+shader_parameter/grain_scale = 250.0
+shader_parameter/grain_density = 0.5
+shader_parameter/flash_amount = 0.005
+shader_parameter/vignette_width = 0.2
+
+[sub_resource type="QuadMesh" id="QuadMesh_qhone"]
+material = SubResource("ShaderMaterial_n56sn")
+flip_faces = true
+size = Vector2(2, 2)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_l0lqn"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1cb51"]
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+albedo_texture = ExtResource("5_e6x5q")
+
+[sub_resource type="QuadMesh" id="QuadMesh_gm5qw"]
+material = SubResource("StandardMaterial3D_1cb51")
+
+[node name="Node3D" type="Node3D"]
+metadata/_edit_lock_ = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_0c71k")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+script = ExtResource("1_cl2r3")
+
+[node name="ShaderQuad" type="MeshInstance3D" parent="Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.755)
+mesh = SubResource("QuadMesh_qhone")
+skeleton = NodePath("../..")
+
+[node name="Cylinder" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_l0lqn")
+
+[node name="Image" type="MeshInstance3D" parent="."]
+transform = Transform3D(12.8695, 0, -18.6617, 0, 10.4007, 0, 15.073, 0, 15.9335, 4.20085, 0.0401666, -7.83664)
+mesh = SubResource("QuadMesh_gm5qw")
