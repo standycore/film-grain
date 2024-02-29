@@ -1,6 +1,8 @@
 shader_type canvas_item;
 
 uniform sampler2D screen_texture : hint_screen_texture;
+// manual texture size uniform
+uniform vec2 texture_size = vec2(512, 512);
 uniform float shake_amount = .005;
 uniform float saturation : hint_range(0.0, 1.0) = 0.2;
 uniform float contrast = 1.5;
@@ -42,13 +44,13 @@ float noise(vec2 st, float seed) {
 void fragment() {
 	// Called for every pixel the material is visible on.
 	
-	vec2 aspect = normalize(vec2(textureSize(screen_texture, 0)));
-	vec2 pixel_size = 1.0 / vec2(textureSize(screen_texture, 0));
+	vec2 aspect = normalize(texture_size);
+	vec2 pixel_size = SCREEN_PIXEL_SIZE;
 	
 	// shaking
 	float shake_offset = hash(TIME) * shake_amount;
 	vec4 screen_sample = texture(
-		screen_texture, vec2(UV.x, UV.y + shake_offset)
+		screen_texture, vec2(SCREEN_UV.x, SCREEN_UV.y + shake_offset)
 	);
 	vec3 col = screen_sample.rgb;
 	
