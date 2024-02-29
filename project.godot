@@ -14,10 +14,6 @@ config/name="Flim Grain"
 config/features=PackedStringArray("4.2", "Mobile")
 config/icon="res://misc/icon.svg"
 
-[display]
-
-window/size/mode=3
-
 [rendering]
 
 renderer/rendering_method="mobile"
