@@ -9,8 +9,13 @@ uniform float contrast = 1.5;
 uniform float brightness = .125;
 uniform float grain_scale = 250.0;
 uniform float grain_density : hint_range(0.0, 1.0) = .5;
+uniform vec4 grain_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);
+uniform vec4 streak_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);
+uniform bool dust_enabled = true;
+uniform sampler2D dust_texture;
 uniform float flash_amount = .005;
 uniform float vignette_width = .2;
+uniform float vignette_opacity : hint_range(0.0, 1.0) = 1.0;
 
 float hash(float n) {
 	return fract(sin(n) * 43758.5453123);
@@ -64,48 +69,76 @@ void fragment() {
 	col += brightness;
 	
 	// grain noise
-	col *= (
-		noise(UV * aspect * grain_scale, TIME) 
-		* grain_density + 1.0 - grain_density
+	col = mix(
+		grain_color.rgb,
+		col,
+		(
+			noise(UV * aspect * grain_scale, TIME)
+			* grain_density + 1.0 - grain_density
+		)
 	);
 	
 	// flashing
 	col += hash(TIME) * flash_amount;
 	
 	// artifacts
-	float streak_x = hash(floor(TIME * 2.0))
-	 + fract(
-		TIME * .1 * (hash(floor(TIME * 3.0)) > .5 ? -1.0 : 1.0)
-	);
-	float streak_width = pixel_size.x * 1.0;
-	if (UV.x > streak_x && UV.x < streak_x + streak_width) {
-		col *= vec3(
-			clamp(noise(UV * 50.0, TIME * 2.0) * 10.0, 0.0, 1.0)
+	// - dust
+	if (dust_enabled) {
+		vec4 dust_sample = texture(
+			dust_texture,
+			fract(UV * aspect * .5 + vec2(hash(TIME), hash(TIME * 2.0)))
+		);
+		col = mix(
+			col,
+			vec3(1.0),
+			dust_sample.r
 		);
 	}
+	
+	// - streaks
+	int num_streaks = 2;
+	for (float i = 1.0; i <= float(num_streaks); i += 1.0) {
+		float streak_x = hash(floor(TIME * 2.0) * i)
+		 + fract(
+			TIME * .1 * (hash(floor(TIME * 3.0) * i) > .5 ? -1.0 : 1.0)
+		);
+		float streak_width = pixel_size.x * 1.0;
+		if (UV.x > streak_x && UV.x < streak_x + streak_width) {
+			col = mix(
+					col,
+					streak_color.rgb,
+					clamp(noise(UV * 20.0, TIME * 2.0 * i) * 10.0, 0.0, 1.0)
+				);
+		}
+	}
+	
 	
 	// vignette
 	vec2 vignette_size = 1.0 / aspect * vignette_width;
 	float vignette_factor = min(
 		min(
 			mix(1.0, 0.0, 
-				(vignette_size.x - UV.x) / vignette_size.x
+				(vignette_size.x - UV.x) / vignette_size.x * vignette_opacity
 			),
 			mix(1.0, 0.0, 
-				(UV.x - (1.0 - vignette_size.x)) / vignette_size.x
+				(UV.x - (1.0 - vignette_size.x)) / vignette_size.x * vignette_opacity
 			)
 		),
 		min(
 			mix(1.0, 0.0, 
-				(vignette_size.y - UV.y) / vignette_size.y
+				(vignette_size.y - UV.y) / vignette_size.y * vignette_opacity
 			),
 			mix(1.0, 0.0, 
-				(UV.y - (1.0 - vignette_size.y)) / vignette_size.y
+				(UV.y - (1.0 - vignette_size.y)) / vignette_size.y * vignette_opacity
 			)
 		)
 	);
 	vignette_factor = min(1.0, vignette_factor);
-	col *= vignette_factor;
+	col = mix(
+		vec3(0.0),
+		col,
+		vignette_factor
+	);
 	
 	COLOR.rgb = col;
 	

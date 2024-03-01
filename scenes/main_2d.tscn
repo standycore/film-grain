@@ -1,32 +1,43 @@
-[gd_scene load_steps=6 format=3 uid="uid://tpwkggvhkibd"]
+[gd_scene load_steps=7 format=3 uid="uid://tpwkggvhkibd"]
 
 [ext_resource type="Texture2D" uid="uid://bsvy0juvk2ywj" path="res://assets/tiger-ii-porsche-yellow-187-ready-made.png" id="1_k0i5j"]
 [ext_resource type="Shader" path="res://scenes/film_canvas.gdshader" id="2_tihoj"]
 [ext_resource type="Script" path="res://scenes/film_canvas.gd" id="3_ic5si"]
+[ext_resource type="Texture2D" uid="uid://ck3grols4bs1q" path="res://assets/Dust-Textures-05.jpg" id="4_av2um"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2868k"]
 shader = ExtResource("2_tihoj")
-shader_parameter/texture_size = Vector2(600, 300)
+shader_parameter/texture_size = Vector2(452, 294)
 shader_parameter/shake_amount = 0.005
 shader_parameter/saturation = 0.2
 shader_parameter/contrast = 1.5
 shader_parameter/brightness = 0.125
 shader_parameter/grain_scale = 250.0
 shader_parameter/grain_density = 0.5
+shader_parameter/grain_color = Color(0, 0, 0, 1)
+shader_parameter/streak_color = Color(0, 0, 0, 1)
+shader_parameter/dust_enabled = true
 shader_parameter/flash_amount = 0.005
 shader_parameter/vignette_width = 0.2
+shader_parameter/vignette_opacity = 1.0
+shader_parameter/dust_texture = ExtResource("4_av2um")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_d51tt"]
 shader = ExtResource("2_tihoj")
-shader_parameter/texture_size = Vector2(344, 500)
+shader_parameter/texture_size = Vector2(377, 459)
 shader_parameter/shake_amount = 0.005
-shader_parameter/saturation = 0.2
-shader_parameter/contrast = 1.5
-shader_parameter/brightness = 0.125
+shader_parameter/saturation = 0.68
+shader_parameter/contrast = 2.52
+shader_parameter/brightness = 0.145
 shader_parameter/grain_scale = 250.0
-shader_parameter/grain_density = 0.5
+shader_parameter/grain_density = 0.192
+shader_parameter/grain_color = Color(1, 1, 1, 1)
+shader_parameter/streak_color = Color(1, 1, 1, 1)
+shader_parameter/dust_enabled = true
 shader_parameter/flash_amount = 0.005
-shader_parameter/vignette_width = 0.2
+shader_parameter/vignette_width = 0.035
+shader_parameter/vignette_opacity = 0.5
+shader_parameter/dust_texture = ExtResource("4_av2um")
 
 [node name="Main2d" type="Node2D"]
 
@@ -47,22 +58,20 @@ grow_vertical = 2
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer/Control"]
 material = SubResource("ShaderMaterial_2868k")
-custom_minimum_size = Vector2(600, 300)
 layout_mode = 1
 offset_left = 66.0
 offset_top = 74.0
-offset_right = 666.0
-offset_bottom = 374.0
+offset_right = 518.0
+offset_bottom = 368.0
 script = ExtResource("3_ic5si")
 
 [node name="ColorRect2" type="ColorRect" parent="CanvasLayer/Control"]
 material = SubResource("ShaderMaterial_d51tt")
-custom_minimum_size = Vector2(200, 500)
 layout_mode = 1
-offset_left = 730.0
-offset_top = 113.0
-offset_right = 1074.0
-offset_bottom = 613.0
+offset_left = 550.0
+offset_top = 115.0
+offset_right = 927.0
+offset_bottom = 574.0
 script = ExtResource("3_ic5si")
 
 [connection signal="resized" from="CanvasLayer/Control/ColorRect" to="CanvasLayer/Control/ColorRect" method="_on_resized"]
