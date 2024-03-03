@@ -13,6 +13,9 @@ uniform vec4 grain_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);
 uniform vec4 streak_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);
 uniform bool dust_enabled = true;
 uniform sampler2D dust_texture;
+uniform float dust_opacity : hint_range(0.0, 1.0) = .5;
+uniform float dust_frequency = 30.0;
+uniform float dust_scale = 4.0;
 uniform float flash_amount = .005;
 uniform float vignette_width = .2;
 uniform float vignette_opacity : hint_range(0.0, 1.0) = 1.0;
@@ -84,14 +87,15 @@ void fragment() {
 	// artifacts
 	// - dust
 	if (dust_enabled) {
+		float seed = floor(TIME * dust_frequency);
 		vec4 dust_sample = texture(
 			dust_texture,
-			fract(UV * aspect * .5 + vec2(hash(TIME), hash(TIME * 2.0)))
+			fract(UV * aspect / dust_scale + vec2(hash(seed), hash(seed + 1.0)))
 		);
 		col = mix(
 			col,
 			vec3(1.0),
-			dust_sample.r
+			min(dust_sample.r, dust_opacity)
 		);
 	}
 	
